@@ -5,6 +5,7 @@
 	<groupId>HelloWorldJSP</groupId>
 	<artifactId>HelloWorldJSP</artifactId>
 	<packaging>war</packaging>
+	<version>1</version>
 	<name>HelloWorldJSP</name>
 	<build>
 		<resources>
@@ -29,6 +30,7 @@
 				<configuration>
 					<warSourceDirectory>WebContent</warSourceDirectory>
 					<outputDirectory>target</outputDirectory>
+					<warName> ${artifactId} </warName>
 				</configuration>
 			</plugin>
 		</plugins>
