@@ -11,6 +11,7 @@ pipeline {
                 git branch: 'stage', url: 'https://github.com/itsnarayan/HelloWorldJSP.git'
              
           }
+          }
 
         stage('Execute Maven') {
             steps {
