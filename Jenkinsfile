@@ -7,7 +7,7 @@ pipeline {
     maven 'MAVEN_HOME'
   }
    
-   stages {
+    stages {
         stage('Code Checkout') {
            steps {  
                echo "Clone git Repository"
@@ -51,7 +51,6 @@ pipeline {
                     
                 echo  'Starting new Container'
                     sh 'docker run -d -p 8081:8080 itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'
-                    
                 echo "Removing docker image from local"
                     sh 'docker image rm itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'
                 
@@ -63,6 +62,17 @@ pipeline {
                 echo "Application Deployed Successfully"
                 echo "Access App using this URL http://localhost:8081/HelloWorldJSP/helloWorld.jsp"
             }
+        }
+    }
+    post {
+        // Clean after build
+        always {
+            cleanWs(cleanWhenNotBuilt: false,
+                    deleteDirs: true,
+                    disableDeferredWipeout: true,
+                    notFailBuild: true,
+                    patterns: [[pattern: '.gitignore', type: 'INCLUDE'],
+                               [pattern: '.propsfile', type: 'EXCLUDE']])
         }
     }
 }
