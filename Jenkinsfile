@@ -51,6 +51,9 @@ pipeline {
                     
                 echo  'Starting new Container'
                     sh 'docker run -d -p 8081:8080 itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'
+                    
+                echo "Removing docker image from local"
+                    sh 'docker image rm itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'
                 
                 echo "Fetching Newly deployed Container ID"
                     script {
