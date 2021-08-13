@@ -34,7 +34,19 @@ pipeline {
         
         stage('Docker Pull and Run') {
            steps {
-                sh 'docker pull itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'    
+                sh 'docker pull itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'       
+          }
+        }
+        
+        stage('Docker Run') {
+           steps {   
+                //stop existing container
+                	//fetch container ID by Image name
+                def runningContainerID = sh	'docker ps | grep \'itsnarayankundgir/helloworldjsp\' | awk \'{ print $1 }\''
+            
+                sh 'docker container stop $runningContainerID'
+              
+              //Run latest image
                 sh 'docker run -d -p 8081:8080 itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'   
           }
         }
