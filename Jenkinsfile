@@ -1,55 +1,65 @@
+def CONTAINER_ID
+def NEW_CONTAINER_ID
+
 pipeline {
     agent any
 	tools {
     maven 'MAVEN_HOME'
   }
-  
+   
    stages {
-      stage('checkout') {
+        stage('Code Checkout') {
            steps {  
-                git branch: 'stage', url: 'https://github.com/itsnarayan/HelloWorldJSP.git'     
-         	 }
+               echo "Clone git Repository"
+                    git branch: 'stage', url: 'https://github.com/itsnarayan/HelloWorldJSP.git'     
+         	}
         }
-
-        stage('Execute Maven') {
-            steps {
-            	sh 'mvn package'          
+  
+        stage('Build Image') {
+           steps {
+               echo "Prepare WAR file of code package" 
+            	    sh 'mvn package' 
+            	    
+               echo "Build Docker Image with latest change" 
+             	    sh 'docker build --tag helloworldjsp:latest .' 
+                    sh 'docker tag helloworldjsp itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'
+            }
+        }
+       	stage('Push Image') {
+           steps {
+                echo "Pushing Integrated code to docker Hub"
+                    sh 'docker image push itsnarayankundgir/helloworldjsp:$BUILD_NUMBER' 
+                echo "Removing docker image from local"
+                    sh 'docker image rm itsnarayankundgir/helloworldjsp:$BUILD_NUMBER' 
+                
             }
         }
         
-        stage('Docker Build and Tag') {
+        stage('Deploy App') {
            steps {
-             	sh 'docker build --tag helloworldjsp:latest .' 
-                sh 'docker tag helloworldjsp itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'
-          }
-        }
-       	stage('Docker Push') {
-           steps {
-
-                sh 'docker image push itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'  
-                sh 'docker image rm itsnarayankundgir/helloworldjsp:$BUILD_NUMBER' 
+                echo "Pulling latest docker Image with tag $BUILD_NUMBER"
+                    sh 'docker pull itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'  
                 
-          }
+                echo "Fetching Current Running Container ID"
+                    script {
+                           CONTAINER_ID = sh(script: "docker ps | grep 'itsnarayankundgir/helloworldjsp' | awk '{ print \$1 }'", returnStdout: true)
+                          echo "Current Running Container ID is $CONTAINER_ID"
+                    }
+                echo "Stopping Current Container $CONTAINER_ID"
+                    sh "docker container stop $CONTAINER_ID"
+                    sh "docker container rm $CONTAINER_ID"
+                    
+                echo  'Starting new Container'
+                    sh 'docker run -d -p 8081:8080 itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'
+                
+                echo "Fetching Newly deployed Container ID"
+                    script {
+                           NEW_CONTAINER_ID = sh(script: "docker ps | grep 'itsnarayankundgir/helloworldjsp' | awk '{ print \$1 }'", returnStdout: true)
+                           echo "Newly Deployed Container ID is $NEW_CONTAINER_ID"
+                    }
+                echo "Application Deployed Successfully"
+                echo "Access App using this URL http://localhost:8081/HelloWorldJSP/helloWorld.jsp"
+            }
         }
-        
-        stage('Docker Pull and Run') {
-           steps {
-                sh 'docker pull itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'       
-          }
-        }
-        
-        stage('Docker Run') {
-           steps {   
-                //stop existing container
-                	//fetch container ID by Image name
-                def runningContainerID = sh	'docker ps | grep \'itsnarayankundgir/helloworldjsp\' | awk \'{ print $1 }\''
-            
-                sh 'docker container stop $runningContainerID'
-              
-              //Run latest image
-                sh 'docker run -d -p 8081:8080 itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'   
-          }
-        }
-       
     }
 }
