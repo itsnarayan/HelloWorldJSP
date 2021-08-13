@@ -9,26 +9,27 @@ pipeline {
            steps {
              
                 git branch: 'stage', url: 'https://github.com/itsnarayan/HelloWorldJSP.git'
+                
              
           }
           }
 
         stage('Execute Maven') {
             steps {
-            	sh 'mvn package'
-                       //  sh "mvn clean install" 
-                       //  sh 'cp /Users/01202794/.m2/repository/HelloWorldJSP/HelloWorldJSP/0.0.1-SNAPSHOT/HelloWorldJSP-0.0.1-SNAPSHOT.war /Users/01202794/.jenkins/workspace/HelloWorldJSP/HelloWorldJSP.war'
+            	sh 'mvn package'          
             }
         }
         
         stage('Docker Build and Tag') {
            steps {
-              
-              echo 'docker command section'
-               // sh 'docker build -t HelloWorldJSP:latest .' 
-               // sh 'docker tag samplewebapp itsnarayan/HelloWorldJSP:latest'
-                //sh 'docker tag samplewebapp nikhilnidhi/samplewebapp:$BUILD_NUMBER'
-               
+             	sh 'docker build --tag helloworldjsp:latest .' 
+                sh 'docker tag helloworldjsp itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'
+          }
+        }
+       	stage('Docker Push') {
+           steps {
+
+                sh 'docker image push itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'       
           }
         }
        
