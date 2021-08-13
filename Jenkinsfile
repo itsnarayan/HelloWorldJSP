@@ -6,13 +6,10 @@ pipeline {
   
    stages {
       stage('checkout') {
-           steps {
-             
-                git branch: 'stage', url: 'https://github.com/itsnarayan/HelloWorldJSP.git'
-                
-             
-          }
-          }
+           steps {  
+                git branch: 'stage', url: 'https://github.com/itsnarayan/HelloWorldJSP.git'     
+         	 }
+        }
 
         stage('Execute Maven') {
             steps {
