@@ -24,8 +24,9 @@ pipeline {
         stage('Docker Build and Tag') {
            steps {
               
-                sh 'docker build -t HelloWorldJSP:latest .' 
-                sh 'docker tag samplewebapp itsnarayan/HelloWorldJSP:latest'
+              echo 'docker command section'
+               // sh 'docker build -t HelloWorldJSP:latest .' 
+               // sh 'docker tag samplewebapp itsnarayan/HelloWorldJSP:latest'
                 //sh 'docker tag samplewebapp nikhilnidhi/samplewebapp:$BUILD_NUMBER'
                
           }
