@@ -26,7 +26,16 @@ pipeline {
        	stage('Docker Push') {
            steps {
 
-                sh 'docker image push itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'       
+                sh 'docker image push itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'  
+                sh 'docker image rm itsnarayankundgir/helloworldjsp:$BUILD_NUMBER' 
+                
+          }
+        }
+        
+        stage('Docker Pull and Run') {
+           steps {
+                sh 'docker pull itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'    
+                sh 'docker run -d -p 8081:8080 itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'   
           }
         }
        
