@@ -40,24 +40,26 @@ pipeline {
                 echo "Pulling latest docker Image with tag $BUILD_NUMBER"
                     sh 'docker pull itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'  
                 
-                echo "Fetching Current Running Container ID"
-                    script {
-                           CONTAINER_ID = sh(script: "docker ps | grep 'itsnarayankundgir/helloworldjsp' | awk '{ print \$1 }'", returnStdout: true)
-                          echo "Current Running Container ID is $CONTAINER_ID"
-                    }
-                echo "Stopping Current Container $CONTAINER_ID"
-                    sh "docker container stop $CONTAINER_ID"
-                    sh "docker container rm $CONTAINER_ID"
+                //echo "Fetching Current Running Container ID"
+                   // script {
+                    //       CONTAINER_ID = sh(script: "docker ps -qf 'name=helloworldjsp-app'", returnStdout: true)
+                   //       echo "Current Running Container ID is $CONTAINER_ID"
+                  //  }
+               // echo "Stopping Current Container $CONTAINER_ID"
+                 //   sh "docker container stop $CONTAINER_ID"
+                 //   sh "docker container rm $CONTAINER_ID"
+		  echo "Stop & Remove Current Container helloworldjsp-app"
+		      sh 'docker stop helloworldjsp-app | xargs docker rm $_'
                     
                 echo  'Starting new Container'
-                    sh 'docker run -d -p 8081:8080 itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'
+                    sh 'docker run -d -p 8081:8080 --name helloworldjsp-app itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'
                 echo "Removing docker image from local"
                     sh 'docker image rm itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'
                 
-                echo "Fetching Newly deployed Container ID"
-                    script {
-                           NEW_CONTAINER_ID = sh(script: "docker ps | grep 'itsnarayankundgir/helloworldjsp' | awk '{ print \$1 }'", returnStdout: true)
-                           echo "Newly Deployed Container ID is $NEW_CONTAINER_ID"
+               // echo "Fetching Newly deployed Container ID"
+                  //  script {
+                   //        NEW_CONTAINER_ID = sh(script: "docker ps -qf 'name=helloworldjsp-app'", returnStdout: true)
+                  //         echo "Newly Deployed Container ID is $NEW_CONTAINER_ID"
                     }
                 echo "Application Deployed Successfully"
                 echo "Access App using this URL http://localhost:8081/HelloWorldJSP/helloWorld.jsp"
