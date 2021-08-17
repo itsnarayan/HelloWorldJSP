@@ -10,26 +10,26 @@ pipeline {
     stages {
         stage('Code Checkout') {
            steps {  
-               echo "Clone git Repository"
+               // Clone git Repository
                     git branch: 'stage', url: 'https://github.com/itsnarayan/HelloWorldJSP.git'     
          	}
         }
   
         stage('Build Image') {
            steps {
-               echo "Prepare WAR file of code package" 
+               // Prepare WAR file of code package
             	    sh 'mvn package' 
             	    
-               echo "Build Docker Image with latest change" 
+               // Build Docker Image with latest change
              	    sh 'docker build --tag helloworldjsp:latest .' 
                     sh 'docker tag helloworldjsp itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'
             }
         }
        	stage('Push Image') {
            steps {
-                echo "Pushing Integrated code to docker Hub"
+                // Pushing Integrated code to docker Hub"
                     sh 'docker image push itsnarayankundgir/helloworldjsp:$BUILD_NUMBER' 
-                echo "Removing docker image from local"
+                // Removing docker image from local"
                     sh 'docker image rm itsnarayankundgir/helloworldjsp:$BUILD_NUMBER' 
                 
             }
@@ -37,30 +37,18 @@ pipeline {
         
         stage('Deploy App') {
            steps {
-                echo "Pulling latest docker Image with tag $BUILD_NUMBER"
-                    sh 'docker pull itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'  
-                
-                //echo "Fetching Current Running Container ID"
-                   // script {
-                    //       CONTAINER_ID = sh(script: "docker ps -qf 'name=helloworldjsp-app'", returnStdout: true)
-                   //       echo "Current Running Container ID is $CONTAINER_ID"
-                  //  }
-               // echo "Stopping Current Container $CONTAINER_ID"
-                 //   sh "docker container stop $CONTAINER_ID"
-                 //   sh "docker container rm $CONTAINER_ID"
-		  echo "Stop & Remove Current Container helloworldjsp-app"
-		      sh 'docker stop helloworldjsp-app | xargs docker rm $_'
+                //Pulling latest docker Image with tag $BUILD_NUMBER
+                sh 'docker pull itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'  
+		
+                // Stop & Remove Current Container helloworldjsp-app
+		sh 'docker stop helloworldjsp-app || true && docker rm helloworldjsp-app || true'
                     
-                echo  'Starting new Container'
-                    sh 'docker run -d -p 8081:8080 --name helloworldjsp-app itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'
-                echo "Removing docker image from local"
-                    sh 'docker image rm itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'
+                // Starting new Container helloworldjsp-app
+                sh 'docker run -d -p 8081:8080 --name helloworldjsp-app itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'
                 
-               // echo "Fetching Newly deployed Container ID"
-                  //  script {
-                   //        NEW_CONTAINER_ID = sh(script: "docker ps -qf 'name=helloworldjsp-app'", returnStdout: true)
-                  //         echo "Newly Deployed Container ID is $NEW_CONTAINER_ID"
-                  //  }
+                // Removing docker image from local
+                sh 'docker image rm itsnarayankundgir/helloworldjsp:$BUILD_NUMBER'
+		   
                 echo "Application Deployed Successfully"
                 echo "Access App using this URL http://localhost:8081/HelloWorldJSP/helloWorld.jsp"
             }
