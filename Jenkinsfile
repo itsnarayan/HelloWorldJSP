@@ -60,7 +60,7 @@ pipeline {
                   //  script {
                    //        NEW_CONTAINER_ID = sh(script: "docker ps -qf 'name=helloworldjsp-app'", returnStdout: true)
                   //         echo "Newly Deployed Container ID is $NEW_CONTAINER_ID"
-                    }
+                  //  }
                 echo "Application Deployed Successfully"
                 echo "Access App using this URL http://localhost:8081/HelloWorldJSP/helloWorld.jsp"
             }
