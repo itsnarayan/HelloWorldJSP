@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+	tools {
+    maven 'MAVEN_HOME'
+  }
+   
+    stages {
+        stage('Code Checkout') {
+           steps {  
+               // Clone git Repository
+                    git branch: 'stage', url: 'https://github.com/itsnarayan/HelloWorldJSP.git'     
+         	}
+        }
+  
+        stage('Build Image') {
+           steps {
+               // Prepare WAR file of code package
+            	    sh 'mvn package' 
+            	    
+               // Build Docker Image with latest change
+             	    sh 'docker build -t itsnarayankundgir/helloworldjsp:$BUILD_NUMBER -t itsnarayankundgir/helloworldjsp:latest .' 
+            }
+        }
+       	stage('Push Image') {
+           steps {
+                // Pushing Integrated code to docker Hub"
+                    sh 'docker image push --all-tags itsnarayankundgir/helloworldjsp'
+                // Removing docker image from local"
+                    sh 'docker image prune --force --all'
+                
+            }
+        }
+    }
+    post {
+        // Clean after build
+        always {
+            cleanWs(cleanWhenNotBuilt: false,
+                    deleteDirs: true,
+                    disableDeferredWipeout: true,
+                    notFailBuild: true,
+                    patterns: [[pattern: '.gitignore', type: 'INCLUDE'],
+                               [pattern: '.propsfile', type: 'EXCLUDE']])
+        }
+    }
+}
