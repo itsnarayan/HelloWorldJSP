@@ -1,6 +1,3 @@
-def CONTAINER_ID
-def NEW_CONTAINER_ID
-
 pipeline {
     agent any
 	tools {
