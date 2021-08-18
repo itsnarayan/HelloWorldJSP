@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+    stages { 
+        stage('Deploy App') {
+           steps {
+                //Pulling latest docker Image with tag latest
+                sh 'docker pull itsnarayankundgir/helloworldjsp:latest'  
+
+                // Stop & Remove Current Container helloworldjsp-app
+	          	  sh 'docker stop helloworldjsp-app || true && docker rm helloworldjsp-app || true'
+                    
+                // Starting new Container helloworldjsp-app
+                sh 'docker run -d -p 8081:8080 --name helloworldjsp-app itsnarayankundgir/helloworldjsp:latest'
+		   
+                echo "Application Deployed Successfully"
+                echo "Access App using this URL http://localhost:8081/HelloWorldJSP/helloWorld.jsp"
+            }
+        }
+    }
+    post {
+        // Clean after build
+        always {
+            cleanWs(cleanWhenNotBuilt: false,
+                    deleteDirs: true,
+                    disableDeferredWipeout: true,
+                    notFailBuild: true,
+                    patterns: [[pattern: '.gitignore', type: 'INCLUDE'],
+                               [pattern: '.propsfile', type: 'EXCLUDE']])
+        }
+    }
+}
