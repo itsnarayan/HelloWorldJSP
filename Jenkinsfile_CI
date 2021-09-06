@@ -8,7 +8,7 @@ pipeline {
         stage('Code Checkout') {
            steps {  
                // Clone git Repository
-                    git branch: 'stage', url: 'https://github.com/itsnarayan/HelloWorldJSP.git'     
+                    git branch: 'master', url: 'https://github.com/itsnarayan/HelloWorldJSP.git'     
          	}
         }
   
